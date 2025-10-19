@@ -1,0 +1,10 @@
+Sacramento;5.9
+Lyon;22.5
+Las Vegas;21.0
+Ouahigouya;32.7
+Brisbane;20.0
+Johannesburg;24.5
+Minneapolis;19.8
+Kyoto;2.7
+Bata;27.2
+Anchorage;6.8

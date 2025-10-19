@@ -1,3 +1,6 @@
 1brc
 1bc-odin
 measurements.txt
+perf.data*
+10k.txt
+flamegraph.svg
