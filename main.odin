@@ -20,7 +20,7 @@ main :: proc() {
 	// buffer: [244912]byte
 	buffer: [2048]byte
 	// buffer: [107]byte ?? Why is this slower??
-	bufio.reader_init_with_buf(&reader, os.stream_from_handle(fileHandle), buffer[:])
+	bufio.reader_init_with_buf(&reader, os.to_stream(fileHandle), buffer[:])
 	defer bufio.reader_destroy(&reader)
 
 	for {
@@ -33,7 +33,7 @@ main :: proc() {
 		for char,i in line {
 			if char == ';' {
 				key := string(line[:i])
-				value := strconv.atof(string(line[i+1: len(line)-1]))
+				value, _ := strconv.parse_f64(string(line[i+1: len(line)-1]))
 				if !(key in cityToValue) {
 					cityToValue[key] = 0
 				}
