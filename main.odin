@@ -9,53 +9,18 @@ import "core:os"
 import "core:strconv"
 import "core:strings"
 
-v1 :: proc() {
-	fileHandle, err := os.open("./1M.txt")
-	assert(err == 0, "failed to open file ")
-	defer os.close(fileHandle)
-
-	cityToValue := make(map[string]f64, 12500)
-	defer delete(cityToValue)
-
-	reader: bufio.Reader
-	//NOTE: 294912 my l1d cache in size
-	// buffer: [244912]byte
-	buffer: [2048]byte
-	// buffer: [107]byte ?? Why is this slower??
-	bufio.reader_init_with_buf(&reader, os.to_stream(fileHandle), buffer[:])
-	defer bufio.reader_destroy(&reader)
-
-	for {
-		line, err := bufio.reader_read_slice(&reader, '\n')
-
-		if err != nil {
-			break
-		}
-
-		for char, i in line {
-			if char == ';' {
-				key := string(line[:i])
-				value, _ := strconv.parse_f64(string(line[i + 1:len(line) - 1]))
-				if !(key in cityToValue) {
-					cityToValue[key] = 0
-				}
-				// cityToValue[key] =+ value
-				// cityToValue[string(line[:i])] = 0
-				// cityToValue[string(line[:i])] = strconv.atof(string(line[i+1: len(line)-1]))
-				break
-			}
-		}
-	}
+// the temperature value is within [-99.9, 99.9] range.
+// the temp will be between 3 and 5 bytes
+// check how odin parses f32
+parse_temp :: proc(raw_temp: []byte) -> f32 {
+	value, _ := strconv.parse_f32(string(raw_temp))
+	return value
 }
 
-v2 :: proc() {
-	fileHandle, err := os.open("./1M.txt")
+read_from_file :: proc(city_to_station: ^HashMap) {
+	fileHandle, err := os.open("./10M.txt")
 	assert(err == 0, "failed to open file ")
 	defer os.close(fileHandle)
-
-	cityToValue, arena := new_hash_map()
-	defer vmem.arena_destroy(&arena)
-
 	reader: bufio.Reader
 	//NOTE: 294912 my l1d cache in size
 	// buffer: [244912]byte
@@ -63,6 +28,7 @@ v2 :: proc() {
 	// buffer: [107]byte ?? Why is this slower??
 	bufio.reader_init_with_buf(&reader, os.to_stream(fileHandle), buffer[:])
 	defer bufio.reader_destroy(&reader)
+
 
 	for {
 		line, err := bufio.reader_read_slice(&reader, '\n')
@@ -74,28 +40,38 @@ v2 :: proc() {
 		for char, i in line {
 			if char == ';' {
 				hash := get_hash(&line, u8(i))
-				exist := get_hash_map_item(&line, u8(i), hash, &cityToValue)
-				value, _ := strconv.parse_f64(string(line[i + 1:len(line) - 1]))
-				if exist == nil {
+				station := get_hash_map_item(&line, u8(i), hash, city_to_station)
+				value := parse_temp(line[i + 1:len(line) - 1])
+				if station == nil {
 					create_hash_map_item(
 						(^([100]byte))(&line[0])^,
 						u8(i),
 						hash,
 						value,
-						&cityToValue,
+						city_to_station,
 					)
 					continue
 				}
-				exist.value += value
-				// cityToValue[key] =+ value
-				// cityToValue[string(line[:i])] = 0
-				// cityToValue[string(line[:i])] = strconv.atof(string(line[i+1: len(line)-1]))
+				station.sum += value
+				if station.min > value {
+					station.min = value
+				} else if station.max < value {
+					station.max = value
+				}
+				station.quanity += 1
 				break
 			}
 		}
 	}
 }
 
+//NOTE: how fast can I write to std output?
+print_results :: proc(city_to_station: ^HashMap) {
+}
+
 main :: proc() {
-	v2()
+	city_to_station, arena := new_hash_map()
+	defer vmem.arena_destroy(&arena)
+
+	read_from_file(&city_to_station)
 }
