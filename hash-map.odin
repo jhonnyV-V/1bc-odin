@@ -5,13 +5,13 @@ import chash "core:hash"
 import vmem "core:mem/virtual"
 
 HashMapValue :: struct {
-	key_len: u8,
-	hash:    u64,
-	sum:     f32,
-	min:     f32,
-	max:     f32,
-	quanity: u32,
-	key:     [100]byte,
+	key_len:  u8,
+	hash:     u64,
+	sum:      f32,
+	min:      f32,
+	max:      f32,
+	quantity: u32,
+	key:      [100]byte,
 }
 
 HashMap :: struct {
@@ -70,13 +70,13 @@ create_hash_map_item :: proc(
 	hash_map: ^HashMap,
 ) {
 	hash_map.values[hash_map.capacity] = HashMapValue {
-		key     = key,
-		key_len = key_len,
-		hash    = hash,
-		sum     = value,
-		min     = value,
-		max     = value,
-		quanity = 1,
+		key      = key,
+		key_len  = key_len,
+		hash     = hash,
+		sum      = value,
+		min      = value,
+		max      = value,
+		quantity = 1,
 	}
 	hash_map.capacity += 1
 }

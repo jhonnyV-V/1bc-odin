@@ -3,7 +3,7 @@ package main
 import "core:bufio"
 import "core:fmt"
 import "core:hash"
-import "core:io"
+import "core:math"
 import vmem "core:mem/virtual"
 import "core:os"
 import "core:strconv"
@@ -58,7 +58,7 @@ read_from_file :: proc(city_to_station: ^HashMap) {
 				} else if station.max < value {
 					station.max = value
 				}
-				station.quanity += 1
+				station.quantity += 1
 				break
 			}
 		}
@@ -67,6 +67,18 @@ read_from_file :: proc(city_to_station: ^HashMap) {
 
 //NOTE: how fast can I write to std output?
 print_results :: proc(city_to_station: ^HashMap) {
+	out := os.to_writer(os.stdout)
+	for i in 0 ..< city_to_station.capacity {
+		station := city_to_station.values[i]
+		fmt.wprintf(
+			out,
+			"%s=%.1f/%.1f/%.1f\n",
+			station.key[:station.key_len],
+			station.min,
+			math.ceil(station.sum / f32(station.quantity)),
+			station.max,
+		)
+	}
 }
 
 main :: proc() {
@@ -74,4 +86,6 @@ main :: proc() {
 	defer vmem.arena_destroy(&arena)
 
 	read_from_file(&city_to_station)
+
+	print_results(&city_to_station)
 }
