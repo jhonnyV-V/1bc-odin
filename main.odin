@@ -87,5 +87,7 @@ main :: proc() {
 
 	read_from_file(&city_to_station)
 
+	sort_hash_map_values_by_key(&city_to_station)
+
 	print_results(&city_to_station)
 }

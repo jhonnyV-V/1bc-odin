@@ -3,6 +3,7 @@ package main
 import "core:bytes"
 import chash "core:hash"
 import vmem "core:mem/virtual"
+import "core:sort"
 
 HashMapValue :: struct {
 	key_len:  u8,
@@ -37,6 +38,28 @@ get_hash :: proc(key: ^[]byte, key_len: u8) -> u64 {
 	return chash.crc64_iso_3306(key[:key_len], 0x9e370001)
 }
 
+compare_values_by_key :: proc(lhs, rhs: HashMapValue) -> int {
+	i: u8 = 0
+	result := 0
+	for {
+		if i == lhs.key_len {
+			return 1
+		}
+		if i == rhs.key_len {
+			return -1
+		}
+		result = sort.compare_u8s(lhs.key[0], rhs.key[0])
+		if result != 0 {
+			return result
+		}
+		i += 1
+	}
+}
+
+sort_hash_map_values_by_key :: proc(city_to_station: ^HashMap) {
+	sort.quick_sort_proc(city_to_station.values, compare_values_by_key)
+}
+
 // improve access time
 get_hash_map_item :: proc(
 	key: ^[]byte,
@@ -60,6 +83,11 @@ get_hash_map_item :: proc(
 		}
 	}
 	return nil
+}
+
+
+// try this approach and try sorting by hash key, that way something like a binary search could be possible
+create_and_sort :: proc(key: [100]byte, key_len: u8, hash: u64, value: f32, hash_map: ^HashMap) {
 }
 
 create_hash_map_item :: proc(
