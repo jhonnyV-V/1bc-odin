@@ -1,9 +1,7 @@
 package main
 
-import "core:bytes"
 import chash "core:hash"
 import vmem "core:mem/virtual"
-import "core:sort"
 
 HashMapValue :: struct {
 	key_len:  u8,
@@ -38,42 +36,6 @@ get_hash :: proc(key: ^[]byte, key_len: u8) -> u64 {
 	return chash.crc64_iso_3306(key[:key_len], 0x9e370001)
 }
 
-compare_values_by_key :: proc(lhs, rhs: HashMapValue) -> int {
-	i: u8 = 0
-	result := 0
-	for {
-		if i == lhs.key_len {
-			return 1
-		}
-		if i == rhs.key_len {
-			return -1
-		}
-		result = sort.compare_u8s(lhs.key[i], rhs.key[i])
-		if result != 0 {
-			return result
-		}
-		i += 1
-	}
-}
-
-compare_values_by_hash :: proc(lhs, rhs: HashMapValue) -> int {
-	if lhs.hash == 0 {
-		return 1
-	}
-	if rhs.hash == 0 {
-		return -1
-	}
-	return sort.compare_u64s(lhs.hash, rhs.hash)
-}
-
-sort_hash_map_values_by_key :: proc(city_to_station: ^HashMap) {
-	sort.quick_sort_proc(city_to_station.values[:city_to_station.capacity], compare_values_by_key)
-}
-
-sort_hash_map_values_by_hash :: proc(city_to_station: ^HashMap) {
-	sort.quick_sort_proc(city_to_station.values[:city_to_station.capacity], compare_values_by_hash)
-}
-
 //NOTE:
 // try something in this vein to iterate over the mapindex = (index + 1) % m->capacity;
 // try this approach and try sorting by hash key, that way something like a binary search could be possible
@@ -100,14 +62,17 @@ create_hash_map_item :: proc(
 	value: f32,
 	hash_map: ^HashMap,
 ) {
-	hash_map.values[hash_map.capacity] = HashMapValue {
-		key      = key,
-		key_len  = key_len,
-		hash     = hash,
-		sum      = value,
-		min      = value,
-		max      = value,
-		quantity = 1,
+
+	#no_bounds_check {
+		hash_map.values[hash_map.capacity] = HashMapValue {
+			key      = key,
+			key_len  = key_len,
+			hash     = hash,
+			sum      = value,
+			min      = value,
+			max      = value,
+			quantity = 1,
+		}
+		hash_map.capacity += 1
 	}
-	hash_map.capacity += 1
 }

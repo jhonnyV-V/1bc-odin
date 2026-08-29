@@ -18,7 +18,7 @@ parse_temp :: proc(raw_temp: []byte) -> f32 {
 }
 
 populate_from_file :: proc(city_to_station: ^HashMap) {
-	fileHandle, err := os.open("./10M.txt")
+	fileHandle, err := os.open("./1M.txt")
 	assert(err == 0, "failed to open file ")
 	defer os.close(fileHandle)
 	reader: bufio.Reader
@@ -67,17 +67,19 @@ populate_from_file :: proc(city_to_station: ^HashMap) {
 
 //NOTE: how fast can I write to std output?
 print_results :: proc(city_to_station: ^HashMap) {
-	out := os.to_writer(os.stdout)
-	for i in 0 ..< city_to_station.capacity {
-		station := city_to_station.values[i]
-		fmt.wprintf(
-			out,
-			"%s=%.1f/%.1f/%.1f\n",
-			station.key[:station.key_len],
-			station.min,
-			math.ceil(station.sum / f32(station.quantity)),
-			station.max,
-		)
+	#no_bounds_check {
+		out := os.to_writer(os.stdout)
+		for i in 0 ..< city_to_station.capacity {
+			station := city_to_station.values[i]
+			fmt.wprintf(
+				out,
+				"%s=%.1f/%.1f/%.1f\n",
+				station.key[:station.key_len],
+				station.min,
+				math.ceil(station.sum / f32(station.quantity)),
+				station.max,
+			)
+		}
 	}
 }
 
