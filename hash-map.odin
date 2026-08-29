@@ -83,9 +83,11 @@ get_hash_map_item :: proc(
 	hash: u64,
 	hash_map: ^HashMap,
 ) -> ^HashMapValue {
-	for i in 0 ..< hash_map.capacity {
-		if hash_map.values[i].hash == hash {
-			return &hash_map.values[i]
+	#no_bounds_check {
+		for i in 0 ..< hash_map.capacity {
+			if hash_map.values[i].hash == hash {
+				return &hash_map.values[i]
+			}
 		}
 	}
 	return nil
