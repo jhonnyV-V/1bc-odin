@@ -85,16 +85,6 @@ get_hash_map_item :: proc(
 ) -> ^HashMapValue {
 	for i in 0 ..< hash_map.capacity {
 		if hash_map.values[i].hash == hash {
-			//WARNING: remove or use ODIN_DISABLE_ASSERT when executing
-			assert(
-				hash_map.values[i].key_len == key_len &&
-				bytes.compare(
-					key[:key_len],
-					hash_map.values[i].key[:hash_map.values[i].key_len],
-				) ==
-					0,
-				"no hash collitions",
-			)
 			return &hash_map.values[i]
 		}
 	}
