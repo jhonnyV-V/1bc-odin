@@ -17,7 +17,7 @@ parse_temp :: proc(raw_temp: []byte) -> f32 {
 	return value
 }
 
-read_from_file :: proc(city_to_station: ^HashMap) {
+populate_from_file :: proc(city_to_station: ^HashMap) {
 	fileHandle, err := os.open("./10M.txt")
 	assert(err == 0, "failed to open file ")
 	defer os.close(fileHandle)
@@ -85,7 +85,7 @@ main :: proc() {
 	city_to_station, arena := new_hash_map()
 	defer vmem.arena_destroy(&arena)
 
-	read_from_file(&city_to_station)
+	populate_from_file(&city_to_station)
 
 	sort_hash_map_values_by_key(&city_to_station)
 

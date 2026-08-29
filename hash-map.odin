@@ -23,7 +23,7 @@ HashMap :: struct {
 new_hash_map :: proc() -> (HashMap, vmem.Arena) {
 	arena: vmem.Arena
 	arena_err := vmem.arena_init_static(&arena, 10_000 * size_of(HashMapValue))
-	ensure(arena_err == nil)
+	ensure(arena_err == nil, "Failed to init arena")
 	arena_alloc := vmem.arena_allocator(&arena)
 
 	hash_map := HashMap {
@@ -56,11 +56,27 @@ compare_values_by_key :: proc(lhs, rhs: HashMapValue) -> int {
 	}
 }
 
-sort_hash_map_values_by_key :: proc(city_to_station: ^HashMap) {
-	sort.quick_sort_proc(city_to_station.values, compare_values_by_key)
+compare_values_by_hash :: proc(lhs, rhs: HashMapValue) -> int {
+	if lhs.hash == 0 {
+		return 1
+	}
+	if rhs.hash == 0 {
+		return -1
+	}
+	return sort.compare_u64s(lhs.hash, rhs.hash)
 }
 
-// improve access time
+sort_hash_map_values_by_key :: proc(city_to_station: ^HashMap) {
+	sort.quick_sort_proc(city_to_station.values[:city_to_station.capacity], compare_values_by_key)
+}
+
+sort_hash_map_values_by_hash :: proc(city_to_station: ^HashMap) {
+	sort.quick_sort_proc(city_to_station.values[:city_to_station.capacity], compare_values_by_hash)
+}
+
+//NOTE:
+// try something in this vein to iterate over the mapindex = (index + 1) % m->capacity;
+// try this approach and try sorting by hash key, that way something like a binary search could be possible
 get_hash_map_item :: proc(
 	key: ^[]byte,
 	key_len: u8,
@@ -83,11 +99,6 @@ get_hash_map_item :: proc(
 		}
 	}
 	return nil
-}
-
-
-// try this approach and try sorting by hash key, that way something like a binary search could be possible
-create_and_sort :: proc(key: [100]byte, key_len: u8, hash: u64, value: f32, hash_map: ^HashMap) {
 }
 
 create_hash_map_item :: proc(
