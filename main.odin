@@ -18,7 +18,7 @@ parse_temp :: proc(raw_temp: []byte) -> f32 {
 }
 
 populate_from_file :: proc(city_to_station: ^HashMap) {
-	fileHandle, err := os.open("./1M.txt")
+	fileHandle, err := os.open("./10M.txt")
 	assert(err == 0, "failed to open file ")
 	defer os.close(fileHandle)
 	reader: bufio.Reader
@@ -50,6 +50,7 @@ populate_from_file :: proc(city_to_station: ^HashMap) {
 						value,
 						city_to_station,
 					)
+					insertion_sort_map_values(city_to_station)
 					continue
 				}
 				station.sum += value

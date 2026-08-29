@@ -36,9 +36,6 @@ get_hash :: proc(key: ^[]byte, key_len: u8) -> u64 {
 	return chash.crc64_iso_3306(key[:key_len], 0x9e370001)
 }
 
-//NOTE:
-// try something in this vein to iterate over the mapindex = (index + 1) % m->capacity;
-// try this approach and try sorting by hash key, that way something like a binary search could be possible
 get_hash_map_item :: proc(
 	key: ^[]byte,
 	key_len: u8,
@@ -46,9 +43,18 @@ get_hash_map_item :: proc(
 	hash_map: ^HashMap,
 ) -> ^HashMapValue {
 	#no_bounds_check {
-		for i in 0 ..< hash_map.capacity {
-			if hash_map.values[i].hash == hash {
-				return &hash_map.values[i]
+		start := 0
+		end := hash_map.capacity
+		for start < end {
+			middle := (start + end) / 2
+			current := &hash_map.values[middle]
+			if current.hash == hash {
+				return current
+			} else if hash < current.hash {
+				//target left of the middle
+				end = middle
+			} else {
+				start = middle + 1
 			}
 		}
 	}

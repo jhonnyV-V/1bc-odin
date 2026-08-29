@@ -34,20 +34,27 @@ compare_values_by_hash :: proc(lhs, rhs: HashMapValue) -> int {
 	}
 }
 
-sort_hash_map_values_by_key :: proc(city_to_station: ^HashMap) {
+sort_hash_map_values_by_key :: proc(hash_map: ^HashMap) {
 	#no_bounds_check {
-		sort.quick_sort_proc(
-			city_to_station.values[:city_to_station.capacity],
-			compare_values_by_key,
-		)
+		sort.quick_sort_proc(hash_map.values[:hash_map.capacity], compare_values_by_key)
 	}
 }
 
-sort_hash_map_values_by_hash :: proc(city_to_station: ^HashMap) {
+sort_hash_map_values_by_hash :: proc(hash_map: ^HashMap) {
 	#no_bounds_check {
-		sort.quick_sort_proc(
-			city_to_station.values[:city_to_station.capacity],
-			compare_values_by_hash,
-		)
+		sort.quick_sort_proc(hash_map.values[:hash_map.capacity], compare_values_by_hash)
+	}
+}
+
+insertion_sort_map_values :: proc(hash_map: ^HashMap) {
+	#no_bounds_check {
+		swap: HashMapValue
+		for i in 1 ..< hash_map.capacity {
+			for j := i; j > 0 && hash_map.values[j - 1].hash > hash_map.values[j].hash; j -= 1 {
+				swap = hash_map.values[j]
+				hash_map.values[j] = hash_map.values[j - 1]
+				hash_map.values[j - 1] = swap
+			}
+		}
 	}
 }
