@@ -48,7 +48,7 @@ compare_values_by_key :: proc(lhs, rhs: HashMapValue) -> int {
 		if i == rhs.key_len {
 			return -1
 		}
-		result = sort.compare_u8s(lhs.key[0], rhs.key[0])
+		result = sort.compare_u8s(lhs.key[i], rhs.key[i])
 		if result != 0 {
 			return result
 		}
