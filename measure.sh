@@ -1,0 +1,2 @@
+./graph.sh
+./timing.sh

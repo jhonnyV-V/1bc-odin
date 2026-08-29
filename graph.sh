@@ -1,2 +1,2 @@
 odin build . -debug
-flamegraph -- ./1bc-odin
+flamegraph --freq 2000 --skip-after main -- ./1bc-odin
