@@ -32,8 +32,18 @@ new_hash_map :: proc() -> (HashMap, vmem.Arena) {
 	return hash_map, arena
 }
 
-get_hash :: proc(key: ^[]byte, key_len: u8) -> u64 {
-	return chash.crc64_iso_3306(key[:key_len], 0x9e370001)
+get_hash :: proc(key: []byte, key_len: u8) -> u64 {
+	// return chash.murmur64b(key[:key_len]) //1351ms
+	// return chash.crc64_iso_3306(key[:key_len], 0x9e370001) //1426ms
+	// return chash.crc64_iso_3306(key[:key_len]) //1414ms
+	// return chash.murmur64a(key[:key_len]) //1320ms
+	// return chash.crc64_ecma_182(key[:key_len]) //1406ms
+	// return chash.crc64_xz(key[:key_len]) //1498ms
+	// return chash.crc64_iso_3306_inverse(key[:key_len]) //1438ms
+	// return chash.fnv64(key[:key_len]) //1278ms
+	// return chash.fnv64a(key[:key_len]) //1297ms
+	// return chash.fnv64_no_a(key[:key_len]) //1278ms
+	return chash.fnv64(key[:key_len])
 }
 
 get_hash_map_item :: proc(

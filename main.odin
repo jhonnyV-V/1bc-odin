@@ -29,29 +29,31 @@ populate_from_file :: proc(city_to_station: ^HashMap) {
 		}
 
 		for char, i in line {
-			if char == ';' {
-				hash := get_hash(&line, u8(i))
-				station := get_hash_map_item(&line, u8(i), hash, city_to_station)
-				value := parse_temp(line[i + 1:len(line) - 1])
-				if station == nil {
-					create_hash_map_item(
-						(^([100]byte))(&line[0])^,
-						u8(i),
-						hash,
-						value,
-						city_to_station,
-					)
-					insertion_sort_map_values(city_to_station)
-					continue
+			#no_bounds_check {
+				if char == ';' {
+					hash := get_hash(line, u8(i))
+					station := get_hash_map_item(&line, u8(i), hash, city_to_station)
+					value := parse_temp(line[i + 1:len(line) - 1])
+					if station == nil {
+						create_hash_map_item(
+							(^([100]byte))(&line[0])^,
+							u8(i),
+							hash,
+							value,
+							city_to_station,
+						)
+						insertion_sort_map_values(city_to_station)
+						continue
+					}
+					station.sum += value
+					if station.min > value {
+						station.min = value
+					} else if station.max < value {
+						station.max = value
+					}
+					station.quantity += 1
+					break
 				}
-				station.sum += value
-				if station.min > value {
-					station.min = value
-				} else if station.max < value {
-					station.max = value
-				}
-				station.quantity += 1
-				break
 			}
 		}
 	}
