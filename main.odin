@@ -6,16 +6,7 @@ import "core:hash"
 import "core:math"
 import vmem "core:mem/virtual"
 import "core:os"
-import "core:strconv"
 import "core:strings"
-
-// the temperature value is within [-99.9, 99.9] range.
-// the temp will be between 3 and 5 bytes
-// check how odin parses f32
-parse_temp :: proc(raw_temp: []byte) -> f32 {
-	value, _ := strconv.parse_f32(string(raw_temp))
-	return value
-}
 
 populate_from_file :: proc(city_to_station: ^HashMap) {
 	fileHandle, err := os.open("./10M.txt")
