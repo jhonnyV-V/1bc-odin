@@ -22,27 +22,9 @@ compare_values_by_key :: proc(lhs, rhs: HashMapValue) -> int {
 	}
 }
 
-compare_values_by_hash :: proc(lhs, rhs: HashMapValue) -> int {
-	#no_bounds_check {
-		if lhs.hash == 0 {
-			return 1
-		}
-		if rhs.hash == 0 {
-			return -1
-		}
-		return sort.compare_u64s(lhs.hash, rhs.hash)
-	}
-}
-
 sort_hash_map_values_by_key :: proc(hash_map: ^HashMap) {
 	#no_bounds_check {
 		sort.quick_sort_proc(hash_map.values[:hash_map.capacity], compare_values_by_key)
-	}
-}
-
-sort_hash_map_values_by_hash :: proc(hash_map: ^HashMap) {
-	#no_bounds_check {
-		sort.quick_sort_proc(hash_map.values[:hash_map.capacity], compare_values_by_hash)
 	}
 }
 

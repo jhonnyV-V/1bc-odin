@@ -46,6 +46,7 @@ get_hash :: proc(key: []byte, key_len: u8) -> u64 {
 	return chash.fnv64(key[:key_len])
 }
 
+// WARNING: how to make access faster
 get_hash_map_item :: proc(
 	key: ^[]byte,
 	key_len: u8,
